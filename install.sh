@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-git init
+gitdir=$(ls -a | grep ".git")
+if [[ $gitdir == "" ]];
+then 
+    echo the current directory is not a git res
+    exit 1
+fi
+
+if [[ $(which luacheck)=="" ]];
+then
+    echo luacheck is not avaiable!
+    exit 1
+fi
 tmp_dir=TMP_$RANDOM
 git clone https://github.com/yfge/lua-git-hooks.git  $tmp_dir
 cp ./$tmp_dir/luacheck_rc ./.luacheckrc
