@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+echo -e "\033[36m   Openresty Git Hooks\033[0m"
+echo -e "\t\t\tpowered by \033[32m 拐爷&老拐瘦 \033[0m"
+echo -e "\t\t\t\t\033[36m beta 1.0\033[0m\n"
+echo -e '------------------------------------------------'
+lua_files=$(git status -s | grep lua  | gawk '{if($1=="A"||$1=="M") {print $2}}')
+let "i=0"
+
+err_warnings=(
+"setting non-standard global variable"
+"accessing undefined variable"
+)
+for file in $lua_files
+    do
+        echo -e  "CHECK\t$file\t\t\t\c"
+        info=$(luacheck $file )
+        result=$(echo -e "($info)" | tail -1 | gawk '{print $5}'|sed  -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g")
+        warning_stop=()
+        let "w_index=0"
+        if [[ $result == "0" ]] 
+        then
+            # 对忍不了的进行处理一下
+            for ((k=0; k <${#err_warnings[@]};k++)) 
+                do 
+                    err=$(echo -e "($info)" | grep "${err_warnings[$k]}")
+                    if [[ $err != "" ]] 
+                    then
+                        warning_stop[$w_index]=$err
+                        let "w_index=w_index+1"
+                    fi                     
+                done
+            if [[ ${#warning_stop[*]} > 0 ]]
+            then
+                echo -e "\033[31m\tFAIL\033[0m"
+                echo -e "Please check the errors below:"
+                for((w=0; w <${#warning_stop[*]}; w ++))
+                    do 
+                        echo "${warning_stop[$w]}"
+                    done 
+                let "i=i+1"
+            else  
+                echo -e "\033[32m\tSUCCESS\033[0m"
+            fi
+           
+        else 
+            echo -e "\033[31m\tFAIL\033[0m"
+            echo -e "please check the errors below"
+            echo -e "($info)"|grep ":[0-9]"
+            let "i=i+1" 
+        fi 
+    done
+echo ""
+if [[ $i == "0" ]] 
+then 
+    echo "Congratulations!"
+else
+    echo "I'm so SORRY...."
+fi
+exit $i  
