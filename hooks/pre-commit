@@ -3,7 +3,7 @@ echo -e "\033[36m   Openresty Git Hooks\033[0m"
 echo -e "\t\t\tpowered by \033[32m 拐爷&老拐瘦 \033[0m"
 echo -e "\t\t\t\t\033[36m beta 1.0\033[0m\n"
 echo -e '------------------------------------------------'
-lua_files=$(git status -s | grep lua  | gawk '{if($1=="A"||$1=="M") {print $2}}')
+lua_files=$(git status -s  --ignore-submodules | grep  ".lua$" | gawk '{if($1=="A"||$1=="M") {print $2}}')
 let "i=0"
 
 err_warnings=(
