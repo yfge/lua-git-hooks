@@ -5,8 +5,9 @@ then
     echo the current directory is not a git res
     exit 1
 fi
+luacheck_path=$(which luacheck)
 
-if [[ $(which luacheck)=="" ]];
+if [[ $luacheck_path == "" ]];
 then
     echo luacheck is not avaiable!
     exit 1
